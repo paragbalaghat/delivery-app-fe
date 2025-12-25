@@ -37,7 +37,7 @@ export default function StatusPage() {
     setData(null);
 
     try {
-      const res = await fetch(`/api/status?invoice=${encodeURIComponent(invoice.trim())}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BE_URL}/orders/status/${encodeURIComponent(invoice.trim())}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

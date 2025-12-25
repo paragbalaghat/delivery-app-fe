@@ -23,12 +23,13 @@ export default function LoginPage() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        const response = await fetch("/api/login", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BE_URL}/auth/login`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({ email, password }),
+            credentials: 'include',
         });
 
         const data = await response.json();
