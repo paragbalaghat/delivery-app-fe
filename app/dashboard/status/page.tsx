@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Loader2, Search } from 'lucide-react';
+import { Loader2, Search, Receipt, User, Package, Tag, IndianRupee } from 'lucide-react';
 import { toast } from 'sonner';
 
 type StatusResponse = {
@@ -48,7 +48,6 @@ export default function StatusPage() {
       const json: StatusResponse = await res.json();
 
       if (!res.ok) {
-        console.log('Fetch error:', json);
         throw new Error(json.message || 'Failed to fetch order status');
       }
 
@@ -65,44 +64,71 @@ export default function StatusPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 p-6 flex items-center justify-center">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Check Order Status</CardTitle>
+    <div className="min-h-screen bg-[#f8fafc] p-6 flex items-center justify-center">
+      <Card className="w-full max-w-md border-slate-200 shadow-sm">
+        <CardHeader className="text-center space-y-1">
+          <CardTitle className="text-xl font-bold">Track Order</CardTitle>
+          <p className="text-sm text-slate-500">Enter invoice number for live status</p>
         </CardHeader>
 
-        <CardContent className="space-y-5">
-          {/* Input */}
+        <CardContent className="space-y-6">
+          {/* Input Group */}
           <div className="flex gap-2">
-            <Input
-              placeholder="Enter invoice (e.g. SB/21200)"
-              value={invoice}
-              onChange={(e) => setInvoice(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && fetchStatus()}
-            />
-            <Button onClick={fetchStatus} disabled={loading}>
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="e.g. SB/21200"
+                className="pl-10 h-11 bg-slate-50 border-slate-200 focus:bg-white"
+                value={invoice}
+                onChange={(e) => setInvoice(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && fetchStatus()}
+              />
+            </div>
+            <Button onClick={fetchStatus} disabled={loading} className="h-11 px-5">
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
-                <Search className="h-4 w-4" />
+                "Search"
               )}
             </Button>
           </div>
 
-          {/* Result */}
+          {/* Result Section */}
           {data && (
-            <div className="space-y-4 border-t pt-4">
-              <Info label="Invoice" value={data.invoice} />
-              <Info label="Customer" value={data.name} />
-              <Info
-                label="Status"
-                value={<Badge variant="outline">{data.status}</Badge>}
-              />
-              <Info label="Total Items" value={data.totalItems.toString()} />
-              <Info
-                label="Amount"
-                value={`₹${data.amount.toLocaleString('en-IN')}`}
-              />
+            <div className="space-y-1 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 space-y-3">
+                <Info 
+                  icon={<Receipt className="w-3.5 h-3.5" />} 
+                  label="Invoice" 
+                  value={data.invoice} 
+                />
+                <Info 
+                  icon={<User className="w-3.5 h-3.5" />} 
+                  label="Customer" 
+                  value={data.name} 
+                />
+                <Info 
+                  icon={<Tag className="w-3.5 h-3.5" />} 
+                  label="Status" 
+                  value={
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-700 border-none hover:bg-blue-100 font-bold text-[10px] uppercase">
+                      {data.status}
+                    </Badge>
+                  } 
+                />
+                <Info 
+                  icon={<Package className="w-3.5 h-3.5" />} 
+                  label="Total Items" 
+                  value={data.totalItems.toString()} 
+                />
+                
+                <div className="pt-3 mt-1 border-t flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-tight">Total Amount</span>
+                  <span className="text-lg font-bold text-slate-900">
+                    ₹{data.amount.toLocaleString('en-IN')}
+                  </span>
+                </div>
+              </div>
             </div>
           )}
         </CardContent>
@@ -111,17 +137,23 @@ export default function StatusPage() {
   );
 }
 
+// Added 'icon' prop to your existing Info component
 function Info({
   label,
   value,
+  icon
 }: {
   label: string;
   value: React.ReactNode;
+  icon?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between text-sm">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium">{value}</span>
+    <div className="flex items-center justify-between text-sm py-1">
+      <div className="flex items-center gap-2 text-slate-500">
+        {icon}
+        <span className="text-xs font-medium">{label}</span>
+      </div>
+      <span className="font-semibold text-slate-700">{value}</span>
     </div>
   );
 }
