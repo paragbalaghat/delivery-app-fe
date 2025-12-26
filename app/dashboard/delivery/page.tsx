@@ -14,13 +14,10 @@ export default function DeliveryPage() {
     setLoading(true);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_BE_URL}/delivery/create`,
-        {
+      const res = await fetch(`/api/delivery/create`,{
           method: 'POST',
           credentials: 'include',
-        }
-      );
+        });
 
       const data = await res.json();
 
