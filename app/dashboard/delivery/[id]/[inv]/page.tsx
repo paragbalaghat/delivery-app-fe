@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
-    Receipt, User, Calendar, Truck, ArrowLeft,
+    Receipt, User, Calendar, Truck, ArrowLeft, ExternalLink,
     Clock, IndianRupee, MapPin, ChevronLeft, CircleX, Loader
 } from "lucide-react"
 import Link from "next/link"
@@ -24,6 +24,7 @@ type InvoiceData = {
     createdAt: string;
     deliveredAt: string | null;
     deliveryRemark: string | null;
+    location: string | null;
     delivery: {
         deliveryNo: string;
         startedAt: string | null;
@@ -40,19 +41,19 @@ const InvoicePage = () => {
 
     const router = useRouter();
 
-    useEffect(() => {
-        const fetchInvoice = async () => {
-            try {
-                const res = await fetch(`/api/delivery/invoice?id=${inv}`);
-                const json = await res.json();
-                if (json.success) setData(json.data);
-            } catch (error) {
-                console.error("Failed to fetch invoice", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchInvoice = async () => {
+        try {
+            const res = await fetch(`/api/delivery/invoice?id=${inv}&deliveryId=${id}`);
+            const json = await res.json();
+            if (json.success) setData(json.data);
+        } catch (error) {
+            console.error("Failed to fetch invoice", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         if (inv) fetchInvoice();
     }, [inv]);
 
@@ -150,13 +151,13 @@ const InvoicePage = () => {
                         <CardContent className="space-y-4">
                             <DetailRow icon={<Truck className="w-4 h-4" />} label="Run ID" value={data.delivery.deliveryNo} />
                             <DetailRow icon={<Calendar className="w-4 h-4" />} label="Date" value={new Date(data.createdAt).toLocaleDateString()} />
-                            <DetailRow icon={<MapPin className="w-4 h-4" />} label="Location" value="Not Available" />
+                            <DetailRow icon={<MapPin className="w-4 h-4" />} label="Delivery Location" value={data.location} isLocation />
                         </CardContent>
                     </Card>
                 </div>
 
                 <div>
-                    <DeliverInvoiceButton delivered={!!data.deliveredAt} invoiceId={String(inv)} />
+                    <DeliverInvoiceButton onSuccess={fetchInvoice} delivered={!!data.deliveredAt} invoiceId={String(inv)} />
                 </div>
 
                 <div>
@@ -202,16 +203,55 @@ const InvoicePage = () => {
     )
 }
 
-// Small helper for Data Rows
-const DetailRow = ({ icon, label, value }: { icon: React.ReactNode, label: string, value: string }) => (
-    <div className="flex items-center justify-between text-sm">
-        <div className="flex items-center gap-2 text-slate-500">
-            {icon}
-            <span className="font-medium">{label}</span>
+interface DetailRowProps {
+    icon: React.ReactNode;
+    label: string;
+    value: string | null | undefined;
+    isLocation?: boolean; // New flag to trigger location logic
+}
+
+const DetailRow = ({ icon, label, value, isLocation }: DetailRowProps) => {
+    // Logic to handle Google Maps redirect
+    const handleLocationClick = () => {
+        if (!value) return;
+        try {
+            // Assuming value is a JSON string like '{"lat": 21.123, "lng": 78.456}'
+            const coords = typeof value === 'string' ? JSON.parse(value) : value;
+
+            if (coords.lat && coords.lng) {
+                const url = `https://www.google.com/maps/search/?api=1&query=${coords.lat},${coords.lng}`;
+                window.open(url, '_blank');
+            }
+        } catch (e) {
+            console.error("Invalid location format", e);
+        }
+    };
+
+    const hasValue = value && value !== "null";
+
+    return (
+        <div className="flex items-center justify-between text-sm py-1">
+            <div className="flex items-center gap-2 text-slate-500">
+                {icon}
+                <span className="font-medium">{label}</span>
+            </div>
+
+            {isLocation && hasValue ? (
+                <button
+                    onClick={handleLocationClick}
+                    className="flex items-center gap-1.5 text-blue-600 hover:text-blue-700 font-bold transition-colors group"
+                >
+                    <span>View on Map</span>
+                    <ExternalLink className="w-3 h-3 transition-transform" />
+                </button>
+            ) : (
+                <span className="font-bold text-slate-900">
+                    {hasValue ? value : "Not Available"}
+                </span>
+            )}
         </div>
-        <span className="font-bold text-slate-900">{value}</span>
-    </div>
-)
+    );
+};
 
 // Small helper for Timeline Nodes
 const TimelineNode = ({ icon, title, desc, time, isDone, isLast }: any) => (

@@ -9,13 +9,14 @@ export async function GET(request: NextRequest){
     const token = cookieStore.get('token')?.value;
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
+    const deliveryId = searchParams.get('deliveryId');
 
     if (!token) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     try {
-        const response = await fetch(`${BACKEND_URL}/delivery/invoice/${id}`, {
+        const response = await fetch(`${BACKEND_URL}/delivery/${deliveryId}/invoice/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             },
