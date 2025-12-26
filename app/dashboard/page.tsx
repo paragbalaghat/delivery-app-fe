@@ -1,18 +1,10 @@
 'use client';
 
-import React, { useEffect } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import React, { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowDownUp, Search, Plus, ExternalLink } from "lucide-react";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 type Delivery = {
@@ -24,17 +16,19 @@ type Delivery = {
 
 export default function DashboardPage() {
 
-  const [deliveries, setDeliveries] = React.useState<Delivery[]>([]);
+  const [deliveries, setDeliveries] = useState<Delivery[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
 
     const fetchDeliveries = async () => {
+      setLoading(true);
       try {
         const res = await fetch(`/api/delivery`, {
           method: 'GET',
           credentials: 'include',
         })
-        
+
         const json = await res.json();
 
         if (!res.ok) {
@@ -45,12 +39,22 @@ export default function DashboardPage() {
 
       } catch (error) {
         console.error("Failed to fetch deliveries:", error);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchDeliveries();
 
   }, []);
+
+  if(loading){
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
@@ -63,10 +67,10 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-3">
             <Link href={'/dashboard/status'}>
-            <Button variant="outline" className="gap-2 bg-white">
-              <ArrowDownUp className="h-4 w-4" />
-              Order Status
-            </Button>
+              <Button variant="outline" className="gap-2 bg-white">
+                <ArrowDownUp className="h-4 w-4" />
+                Order Status
+              </Button>
             </Link>
             <Button className="gap-2 bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-200">
               <Plus className="h-4 w-4" />
@@ -79,48 +83,40 @@ export default function DashboardPage() {
       <main className="max-w-7xl mx-auto p-8 space-y-6">
         {/* 2. Filters & Stats Bar */}
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="relative w-full sm:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-            <Input 
-              placeholder="Search by Order ID or Customer..." 
-              className="pl-10 bg-white border-slate-200 focus:ring-blue-500"
-            />
-          </div>
           <div className="flex items-center gap-2 text-sm text-slate-500 font-medium">
-            <span>Showing {data.length} active orders</span>
+            <span>Showing {deliveries.length} active {deliveries.length === 1 ? 'delivery' : 'deliveries'}</span>
           </div>
         </div>
 
         {/* 3. Refined Table */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <Table>
-            <TableHeader className="bg-slate-50/50">
-              <TableRow>
-                <TableHead className="font-semibold text-slate-700">Delivery ID</TableHead>
-                <TableHead className="font-semibold text-slate-700">Started</TableHead>
-                <TableHead className="font-semibold text-slate-700">Ended</TableHead>
-                <TableHead className="font-semibold text-slate-700 text-center">Invoice Count</TableHead>
-                <TableHead className="w-20"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {deliveries.map((delivery) => (
-                <TableRow key={delivery.id} className="hover:bg-slate-50/50 transition-colors">
-                  <TableCell className="font-mono text-slate-900">{delivery.id}</TableCell>
-                  <TableCell>{delivery.startedAt ? new Date(delivery.startedAt).toLocaleDateString() : 'N/A'}</TableCell>
-                  <TableCell>{delivery.endedAt ? new Date(delivery.endedAt).toLocaleDateString() : 'N/A'}</TableCell>
-                  <TableCell className="text-center">{delivery.invoiceCount}</TableCell>
-                  <TableCell>
-                    <Link href={`/dashboard/delivery/${delivery.id}`}>
-                      <Button variant="ghost" className="p-0 w-8 h-8">
-                        <ExternalLink className="w-4 h-4 text-slate-600" />
-                      </Button>
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {deliveries.map((delivery) => (
+            <Link
+              key={delivery.id}
+              href={`/dashboard/delivery/${delivery.id}`}
+              className="group block p-5 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-blue-500 hover:shadow-md transition-all active:scale-[0.98]"
+            >
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Delivery ID</p>
+                  <p className="text-lg font-mono font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                    {delivery.id}
+                  </p>
+                </div>
+                <div className="p-2 bg-slate-50 rounded-lg group-hover:bg-blue-50 transition-colors">
+                  <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-blue-600" />
+                </div>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-slate-50 flex items-center justify-between text-xs text-slate-500">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  {delivery.invoiceCount} Invoices
+                </div>
+                <span>{delivery.startedAt ? new Date(delivery.startedAt).toLocaleDateString() : 'N/A'}</span>
+              </div>
+            </Link>
+          ))}
         </div>
       </main>
     </div>

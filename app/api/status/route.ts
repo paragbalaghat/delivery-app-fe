@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const token = cookieStore.get('token')?.value || '';
 
     try {
-        const response = await fetch(`${BACKEND_URL}/orders/status/SB21200`, {
+        const response = await fetch(`${BACKEND_URL}/orders/status/${encodeURIComponent(invoice || '')}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

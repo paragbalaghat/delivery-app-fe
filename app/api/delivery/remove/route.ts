@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
-export async function GET(request: NextRequest){
+export async function DELETE(request: NextRequest){
 
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
@@ -17,6 +17,7 @@ export async function GET(request: NextRequest){
 
     try {
         const response = await fetch(`${BACKEND_URL}/delivery/${id}/remove/${invId}`, {
+            method: 'DELETE',
             headers: {
                 Authorization: `Bearer ${token}`
             }

@@ -37,7 +37,7 @@ export default function StatusPage() {
     setData(null);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BE_URL}/orders/status/${encodeURIComponent(invoice.trim())}`, {
+      const res = await fetch(`/api/status?invoice=${encodeURIComponent(invoice.trim())}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -80,11 +80,11 @@ export default function StatusPage() {
                 placeholder="e.g. SB/21200"
                 className="pl-10 h-11 bg-slate-50 border-slate-200 focus:bg-white"
                 value={invoice}
-                onChange={(e) => setInvoice(e.target.value)}
+                onChange={(e) => setInvoice(e.target.value.toUpperCase())}
                 onKeyDown={(e) => e.key === 'Enter' && fetchStatus()}
               />
             </div>
-            <Button onClick={fetchStatus} disabled={loading} className="h-11 px-5">
+            <Button onClick={fetchStatus} disabled={loading || invoice.trim().length < 7} className="h-11 px-5">
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (

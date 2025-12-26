@@ -33,8 +33,7 @@ export default function ParticularDeliveryPage() {
     async function fetchDelivery() {
         setLoading(true);
         try {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_BE_URL}/delivery/get?id=${id}`,
+            const res = await fetch(`/api/delivery/get?id=${id}`,
                 { credentials: 'include' }
             );
 
@@ -54,7 +53,7 @@ export default function ParticularDeliveryPage() {
     async function removeInvoice(invType: string, invNo: string) {
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_BE_URL}/delivery/${id}/remove/${invType}${invNo}`,
+                `/api/delivery/remove?id=${id}&invId=${invType}${invNo}`,
                 { method: 'DELETE', credentials: 'include' }
             );
 
@@ -88,7 +87,7 @@ export default function ParticularDeliveryPage() {
             <header className="sticky top-0 z-10 border-b bg-white/80 backdrop-blur-md px-6 py-4">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href="/deliveries" className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                        <Link href="/dashboard" className="p-2 hover:bg-slate-100 rounded-full transition-colors">
                             <ArrowLeft className="w-5 h-5 text-slate-600" />
                         </Link>
                         <div>
@@ -108,7 +107,7 @@ export default function ParticularDeliveryPage() {
 
                     {/* 2. LEFT SIDEBAR: Actions (Fixed width on desktop) */}
                     <aside className="w-full lg:w-87.5 space-y-6">
-                        <div className="bg-white rounded-xl border shadow-sm p-4">
+                        <div className="">
                             <AddInvoice deliveryId={id} onAdded={fetchDelivery} />
                         </div>
 
