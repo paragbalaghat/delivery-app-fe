@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowDownUp, Package, Search, Plus, MoreHorizontal, ExternalLink } from "lucide-react";
+import { ArrowDownUp, Search, Plus, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -65,7 +65,7 @@ export default function DashboardPage() {
                 <TableHead className="font-semibold text-slate-700">Status</TableHead>
                 <TableHead className="font-semibold text-slate-700">Date</TableHead>
                 <TableHead className="text-right font-semibold text-slate-700">Amount</TableHead>
-                <TableHead className="w-[80px]"></TableHead>
+                <TableHead className="w-20"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
