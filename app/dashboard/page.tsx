@@ -1,6 +1,6 @@
 'use client';
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -15,7 +15,43 @@ import { ArrowDownUp, Search, Plus, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
+type Delivery = {
+  id: string;
+  startedAt: string | null;
+  endedAt: string | null;
+  invoiceCount: number;
+}
+
 export default function DashboardPage() {
+
+  const [deliveries, setDeliveries] = React.useState<Delivery[]>([]);
+
+  useEffect(() => {
+
+    const fetchDeliveries = async () => {
+      try {
+        const res = await fetch(`/api/delivery`, {
+          method: 'GET',
+          credentials: 'include',
+        })
+        
+        const json = await res.json();
+
+        if (!res.ok) {
+          throw new Error(json.message || 'Failed to fetch deliveries');
+        }
+
+        setDeliveries(json.data);
+
+      } catch (error) {
+        console.error("Failed to fetch deliveries:", error);
+      }
+    }
+
+    fetchDeliveries();
+
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#f8fafc]">
       {/* 1. Header Section */}
@@ -60,39 +96,26 @@ export default function DashboardPage() {
           <Table>
             <TableHeader className="bg-slate-50/50">
               <TableRow>
-                <TableHead className="font-semibold text-slate-700">Order ID</TableHead>
-                <TableHead className="font-semibold text-slate-700">Customer</TableHead>
-                <TableHead className="font-semibold text-slate-700">Status</TableHead>
-                <TableHead className="font-semibold text-slate-700">Date</TableHead>
-                <TableHead className="text-right font-semibold text-slate-700">Amount</TableHead>
+                <TableHead className="font-semibold text-slate-700">Delivery ID</TableHead>
+                <TableHead className="font-semibold text-slate-700">Started</TableHead>
+                <TableHead className="font-semibold text-slate-700">Ended</TableHead>
+                <TableHead className="font-semibold text-slate-700 text-center">Invoice Count</TableHead>
                 <TableHead className="w-20"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((row) => (
-                <TableRow key={row.id} className="hover:bg-slate-50/50 transition-colors group">
-                  <TableCell className="font-mono text-sm font-bold text-blue-600">
-                    {row.id}
-                  </TableCell>
+              {deliveries.map((delivery) => (
+                <TableRow key={delivery.id} className="hover:bg-slate-50/50 transition-colors">
+                  <TableCell className="font-mono text-slate-900">{delivery.id}</TableCell>
+                  <TableCell>{delivery.startedAt ? new Date(delivery.startedAt).toLocaleDateString() : 'N/A'}</TableCell>
+                  <TableCell>{delivery.endedAt ? new Date(delivery.endedAt).toLocaleDateString() : 'N/A'}</TableCell>
+                  <TableCell className="text-center">{delivery.invoiceCount}</TableCell>
                   <TableCell>
-                    <div className="font-medium text-slate-900">{row.customer}</div>
-                  </TableCell>
-                  <TableCell>
-                    <span className={cn(
-                      "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border",
-                      getStatusStyles(row.status)
-                    )}>
-                      {row.status}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-slate-500 text-sm italic">{row.date}</TableCell>
-                  <TableCell className="text-right font-semibold text-slate-900">
-                    {row.amount}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ExternalLink className="h-4 w-4 text-slate-400" />
-                    </Button>
+                    <Link href={`/dashboard/delivery/${delivery.id}`}>
+                      <Button variant="ghost" className="p-0 w-8 h-8">
+                        <ExternalLink className="w-4 h-4 text-slate-600" />
+                      </Button>
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))}
