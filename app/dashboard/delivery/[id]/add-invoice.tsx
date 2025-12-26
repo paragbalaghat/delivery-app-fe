@@ -15,15 +15,18 @@ export default function AddInvoice({ deliveryId, onAdded }: { deliveryId: string
   async function submitInvoice(inv: string) {
     if (!inv.trim()) return toast.error('Enter an invoice number');
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BE_URL}/delivery/${deliveryId}/add/${inv}`, { 
+      const res = await fetch(`/api/delivery/add?id=${deliveryId}&invId=${inv}`, { 
         method: 'GET', credentials: 'include' 
       });
-      if (!res.ok) throw new Error('Failed to add');
+
+      const json = await res.json();
+
+      if (!res.ok) throw new Error(json.message || 'Failed to add invoice');
       toast.success('Added');
       setInvoice('');
       onAdded();
     } catch (err) {
-      toast.error('Error adding invoice');
+      toast.error(err instanceof Error ? err.message : 'Something went wrong');
     }
   }
 
@@ -48,7 +51,7 @@ export default function AddInvoice({ deliveryId, onAdded }: { deliveryId: string
         <Input 
           placeholder="Invoice #" 
           value={invoice} 
-          onChange={(e) => setInvoice(e.target.value)}
+          onChange={(e) => setInvoice(e.target.value.toUpperCase())}
           onKeyDown={(e) => e.key === 'Enter' && submitInvoice(invoice)}
         />
         <Button variant="outline" onClick={() => setScanning(true)}>
@@ -56,7 +59,7 @@ export default function AddInvoice({ deliveryId, onAdded }: { deliveryId: string
         </Button>
       </div>
 
-      <Button className="w-full mt-2" onClick={() => submitInvoice(invoice)}>
+      <Button className="w-full mt-2 bg-blue-600" disabled={invoice.trim().length < 7} onClick={() => submitInvoice(invoice)}>
         Add Invoice
       </Button>
 
