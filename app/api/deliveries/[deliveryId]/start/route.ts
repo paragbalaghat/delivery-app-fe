@@ -3,11 +3,11 @@ import { cookies } from "next/headers";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ deliveryId: string, invoiceId: string }> }){
+export async function POST(request: NextRequest, { params }: { params: Promise<{ deliveryId: string }> }){
 
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
-    const { deliveryId, invoiceId } = await params;
+    const { deliveryId } = await params;
 
     if (!token) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
