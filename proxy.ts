@@ -26,7 +26,6 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get('token')?.value
 
-  /* ---------- LOGIN (HANDLE FIRST) ---------- */
 
   if (pathname === '/login') {
     if (!token) return NextResponse.next()
@@ -44,7 +43,6 @@ export async function proxy(request: NextRequest) {
     }
   }
 
-  /* ---------- DASHBOARD REQUIRES AUTH ---------- */
 
   if (!token && pathname.startsWith('/dashboard')) {
     return NextResponse.redirect(new URL('/login', request.url))
@@ -52,7 +50,6 @@ export async function proxy(request: NextRequest) {
 
   if (!token) return NextResponse.next()
 
-  /* ---------- VERIFY TOKEN ---------- */
 
   let payload: JWTUser
   try {
@@ -64,15 +61,12 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  /* ---------- DASHBOARD ROOT ---------- */
 
   if (pathname === '/dashboard') {
     return NextResponse.redirect(
       new URL(roleDashboard(payload.role), request.url)
     )
   }
-
-  /* ---------- ROLE PROTECTION ---------- */
 
   if (pathname.startsWith('/dashboard/admin') && payload.role !== 'ADMIN') {
     return NextResponse.redirect(
@@ -99,4 +93,8 @@ export async function proxy(request: NextRequest) {
   }
 
   return NextResponse.next()
+}
+
+export const config = {
+  matcher: ['/dashboard/:path*', '/login'],
 }
