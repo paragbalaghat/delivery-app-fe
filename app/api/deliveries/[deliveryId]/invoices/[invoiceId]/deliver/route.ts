@@ -5,6 +5,8 @@ const BACKEND_URL = process.env.BACKEND_URL;
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ deliveryId: string, invoiceId: string }> }){
 
+    const { remarks, location } = await request.json();
+
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
     const { deliveryId, invoiceId } = await params;
@@ -17,9 +19,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         const response = await fetch(`${BACKEND_URL}/deliveries/${deliveryId}/invoices/${invoiceId}/deliver`, {
             method: 'POST',
             headers: {
-                Authorization: `Bearer ${token}`
-            }
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ remarks, location })
         })
+
         const data = await response.json();
 
         return NextResponse.json(data, { status: response.status });

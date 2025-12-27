@@ -16,12 +16,13 @@ import { CheckCircle2, MessageSquare, Loader2, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface DeliverInvoiceProps {
+    deliveryId: string;
     invoiceId: string;
     onSuccess?: () => void;
     delivered?: boolean;
 }
 
-export default function DeliverInvoiceButton({ invoiceId, onSuccess, delivered }: DeliverInvoiceProps) {
+export default function DeliverInvoiceButton({ deliveryId, invoiceId, onSuccess, delivered }: DeliverInvoiceProps) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [remark, setRemark] = useState('');
@@ -29,45 +30,58 @@ export default function DeliverInvoiceButton({ invoiceId, onSuccess, delivered }
     const getCoordinates = (): Promise<{ lat: number; lng: number } | null> => {
         return new Promise((resolve) => {
             if (!navigator.geolocation) {
-                toast.error("Geolocation is not supported by your browser");
-                resolve(null);
-                return;
+                toast.error("Geolocation not supported");
+                return resolve(null);
             }
 
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    resolve({
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    });
-                },
-                (error) => {
-                    console.error("Location error:", error);
-                    toast.error("Could not get location. Ensure GPS is on.");
-                    resolve(null);
-                },
-                { enableHighAccuracy: true, timeout: 10000 }
-            );
+            // Strategy: Try High Accuracy (GPS) first, then fall back to Network
+            const fetchLocation = (isHighAccuracy: boolean) => {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        resolve({
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        });
+                    },
+                    (error) => {
+                        if (isHighAccuracy) {
+                            // GPS Failed, try Network/Wi-Fi (faster & works indoors)
+                            console.warn("GPS failed, trying Network fallback...");
+                            fetchLocation(false);
+                        } else {
+                            // Both failed
+                            toast.error("Could not determine location. Please ensure Wi-Fi is ON.");
+                            resolve(null);
+                        }
+                    },
+                    {
+                        enableHighAccuracy: isHighAccuracy,
+                        timeout: isHighAccuracy ? 8000 : 5000, // Shorter timeout for fallback
+                        maximumAge: 10000 // Accept a 10-second old location
+                    }
+                );
+            };
+
+            fetchLocation(true);
         });
     };
 
     async function handleDeliver() {
         setLoading(true);
-        
+
         // 1. Fetch location first
         const location = await getCoordinates();
-        
+
         if (!location) {
             setLoading(false);
             return; // Stop if location is mandatory and failed
         }
 
         try {
-            const res = await fetch(`/api/delivery/invoice/deliver`, {
+            const res = await fetch(`/api/deliveries/${deliveryId}/invoices/${invoiceId}/deliver`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    id: invoiceId,
                     remarks: remark.trim(),
                     location: location
                 }),
@@ -93,7 +107,7 @@ export default function DeliverInvoiceButton({ invoiceId, onSuccess, delivered }
             <DialogTrigger asChild>
                 <Button disabled={delivered} size={"lg"} className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-bold shadow-sm">
                     <CheckCircle2 className="w-4 h-4" />
-                    { delivered ? "Delivered" : "Mark as Delivered" }
+                    {delivered ? "Delivered" : "Mark as Delivered"}
                 </Button>
             </DialogTrigger>
 

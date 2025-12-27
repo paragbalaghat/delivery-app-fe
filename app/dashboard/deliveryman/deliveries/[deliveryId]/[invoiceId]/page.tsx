@@ -185,7 +185,7 @@ const InvoicePage = () => {
                     <PackagingSection packaging={packaging} />
 
                 <div>
-                    <DeliverInvoiceButton onSuccess={fetchInvoice} delivered={!!data.deliveredAt} invoiceId={String(invoiceId)} />
+                    <DeliverInvoiceButton onSuccess={fetchInvoice} delivered={!!data.deliveredAt} invoiceId={String(invoiceId)} deliveryId={String(deliveryId)} />
                 </div>
 
                 <div>
