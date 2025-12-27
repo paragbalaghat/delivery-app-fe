@@ -13,10 +13,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Truck, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function CreateDeliveryButton() {
     const [open, setOpen] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
+
+    const router = useRouter();
+    const pathname = usePathname();
 
     const handleCreateDelivery = async () => {
         setIsCreating(true);
@@ -27,9 +31,12 @@ export default function CreateDeliveryButton() {
                 credentials: 'include',
             });
 
-            if (!response.ok) throw new Error('Failed to create delivery');
+            const json = await response.json();
 
-            toast.success("Delivery created successfully!");
+            if (!response.ok) throw new Error(json.message || 'Failed to create delivery');
+
+            toast.success(json.message || 'Delivery created successfully');
+            router.push(`${pathname}/deliveries/${json.data.id}`);
             setOpen(false); // Close dialog on success
         } catch (error) {
             toast.error("Error creating delivery");
