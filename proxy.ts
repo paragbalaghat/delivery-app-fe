@@ -26,13 +26,10 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get('token')?.value
 
-  /* ---------- PUBLIC ---------- */
-
   if (pathname === '/login' && !token) {
     return NextResponse.next()
   }
 
-  /* ---------- AUTH REQUIRED ---------- */
 
   if (!token && pathname.startsWith('/dashboard')) {
     return NextResponse.redirect(new URL('/login', request.url))
@@ -41,8 +38,6 @@ export async function proxy(request: NextRequest) {
   if (!token) {
     return NextResponse.next()
   }
-
-  /* ---------- VERIFY ---------- */
 
   let payload: JWTUser
   try {
@@ -54,19 +49,14 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  /* ---------- BLOCK LOGIN ---------- */
 
   if (pathname === '/login') {
     return NextResponse.redirect(new URL(roleDashboard(payload.role), request.url))
   }
 
-  /* ---------- DASHBOARD ROOT ---------- */
-
   if (pathname === '/dashboard') {
     return NextResponse.redirect(new URL(roleDashboard(payload.role), request.url))
   }
-
-  /* ---------- ROLE GUARDS ---------- */
 
   if (
     pathname.startsWith('/dashboard/admin') &&
