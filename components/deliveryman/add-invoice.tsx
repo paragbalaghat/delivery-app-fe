@@ -12,17 +12,17 @@ export default function AddInvoice({ deliveryId, onAdded }: { deliveryId: string
   const [scanning, setScanning] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
-  async function submitInvoice(inv: string) {
-    if (!inv.trim()) return toast.error('Enter an invoice number');
+  async function submitInvoice(invoiceId: string) {
+    if (!invoiceId.trim()) return toast.error('Enter an invoice number');
     try {
-      const res = await fetch(`/api/delivery/add?id=${deliveryId}&invId=${inv}`, { 
-        method: 'GET', credentials: 'include' 
+      const res = await fetch(`/api/deliveries/${deliveryId}/invoices/${invoiceId}`, { 
+        method: 'POST', credentials: 'include' 
       });
 
       const json = await res.json();
 
       if (!res.ok) throw new Error(json.message || 'Failed to add invoice');
-      toast.success('Added');
+      toast.success(json.message || 'Invoice added successfully');
       setInvoice('');
       onAdded();
     } catch (err) {

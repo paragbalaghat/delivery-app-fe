@@ -27,7 +27,7 @@ export default function DashboardPage() {
     const fetchDeliveries = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/delivery`, {
+        const res = await fetch(`/api/deliveries`, {
           method: 'GET',
           credentials: 'include',
         })
@@ -98,7 +98,7 @@ export default function DashboardPage() {
           {deliveries.map((delivery) => (
             <Link
               key={delivery.id}
-              href={`${pathname}/delivery/${delivery.id}`}
+              href={`${pathname}/deliveries/${delivery.id}`}
               className="group block p-5 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-blue-500 hover:shadow-md transition-all active:scale-[0.98]"
             >
               <div className="flex justify-between items-start">

@@ -5,15 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
     Receipt, User, Calendar, Truck, ArrowLeft, ExternalLink,
-    Clock, IndianRupee, MapPin, CircleX, Loader, Box, ShoppingBag, Snowflake, Archive
+    Clock, IndianRupee, MapPin, CircleX, Loader2, Box, ShoppingBag, Snowflake, Archive
 } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import DeliverInvoiceButton from "./deliver"
+import DeliverInvoiceButton from "../../../../../../components/deliveryman/deliver"
 
-// Defining the types based on your JSON structure
 type InvoiceData = {
     id: string;
     invType: string;
@@ -30,6 +29,10 @@ type InvoiceData = {
         startedAt: string | null;
         endedAt: string | null;
     };
+    boxes: number;
+    bags: number;
+    icePacks: number;
+    cases: number;
 };
 
 type Packaging = {
@@ -37,35 +40,38 @@ type Packaging = {
     bags: number;
     icePacks: number;
     cases: number;
-}
+};
 
 const InvoicePage = () => {
     const params = useParams();
-    const { id, inv } = params; // delivery ID and invoice ID/No
+    const { deliveryId, invoiceId } = params; // delivery ID and invoice ID/No
 
     const [data, setData] = useState<InvoiceData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [packaging, setPackaging] = useState<Packaging | null>(null);
+    const [packaging, setPackaging] = useState<{
+        boxes: number;
+        bags: number;
+        icePacks: number;
+        cases: number;
+    } | null>(null);
 
     const router = useRouter();
 
     const fetchInvoice = async () => {
         try {
-            const res = await fetch(`/api/delivery/invoice?id=${inv}&deliveryId=${id}`);
+            const res = await fetch(`/api/deliveries/${deliveryId}/invoices/${invoiceId}`);
             const json = await res.json();
-            if (json.success) setData(json.data);
-        } catch (error) {
-            console.error("Failed to fetch invoice", error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
-    const fetchPackagingInfo = async () => {
-        try {
-            const res = await fetch(`/api/status?invoice=${inv}`);
-            const json = await res.json();
-            if (json) setPackaging(json.data.packaging);
+            if(!res.ok) throw new Error(json.message || 'Failed to fetch invoice');
+
+            if (json.success){setData(json.data);
+                setPackaging({
+                    boxes: json.data.boxes,
+                    bags: json.data.bags,
+                    icePacks: json.data.icePacks,
+                    cases: json.data.cases,
+                });
+            }
         } catch (error) {
             console.error("Failed to fetch invoice", error);
         } finally {
@@ -74,15 +80,14 @@ const InvoicePage = () => {
     };
 
     useEffect(() => {
-        if (inv) fetchInvoice();
-        if (inv) fetchPackagingInfo();
-    }, [inv]);
+        if (invoiceId) fetchInvoice();
+    }, [invoiceId]);
 
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed">
                 <div className="p-4 bg-blue-50 rounded-full mb-4">
-                    <Loader className="w-10 h-10 text-blue-500" />
+                    <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
                 </div>
                 <h3 className="text-slate-900 font-medium">Loading Invoice...</h3>
                 <p className="text-slate-500 text-sm">Please wait while the invoice details are being loaded.</p>
@@ -112,7 +117,7 @@ const InvoicePage = () => {
             <header className="sticky top-0 z-10 border-b bg-white/80 backdrop-blur-md px-6 py-4">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href={`/dashboard/deliveryman/delivery/${id}`} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                        <Link href={`/dashboard/deliveryman/deliveries/${deliveryId}`} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
                             <ArrowLeft className="w-5 h-5 text-slate-600" />
                         </Link>
                         <div>
@@ -181,7 +186,7 @@ const InvoicePage = () => {
                     <PackagingSection packaging={packaging} />
 
                 <div>
-                    <DeliverInvoiceButton onSuccess={fetchInvoice} delivered={!!data.deliveredAt} invoiceId={String(inv)} />
+                    <DeliverInvoiceButton onSuccess={fetchInvoice} delivered={!!data.deliveredAt} invoiceId={String(invoiceId)} />
                 </div>
 
                 <div>

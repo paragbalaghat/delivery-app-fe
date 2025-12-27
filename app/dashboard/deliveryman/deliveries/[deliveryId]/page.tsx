@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
-import AddInvoice from './add-invoice';
-import InvoiceCard from './invoice-card';
+import AddInvoice from '@/components/deliveryman/add-invoice';
+import InvoiceCard from '@/components/deliveryman/invoice-card';
 import Link from 'next/link';
-import { AlertCircle, ArrowLeft, CircleX, Info, Loader, Loader2, Package, Timer, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CircleX, Info, Loader2, Package, Timer, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import StartDeliveryButton from './start';
-import CompleteDeliveryButton from './complete';
+import StartDeliveryButton from '../../../../../components/deliveryman/start';
+import CompleteDeliveryButton from '@/components/deliveryman/complete';
 import { cn } from '@/lib/utils';
 
 type Invoice = {
@@ -36,7 +36,7 @@ type DeliveryResponse = {
 };
 
 export default function ParticularDeliveryPage() {
-    const { id } = useParams<{ id: string }>();
+    const { deliveryId } = useParams<{ deliveryId: string }>();
 
     const [isValidDelivery, setIsValidDelivery] = useState<boolean | null>(true);
     const [delivery, setDelivery] = useState<DeliveryResponse['data'] | null>(null);
@@ -46,7 +46,7 @@ export default function ParticularDeliveryPage() {
     async function fetchDelivery() {
         setLoading(true);
         try {
-            const res = await fetch(`/api/delivery/get?id=${id}`,
+            const res = await fetch(`/api/deliveries/${deliveryId}`,
                 { credentials: 'include' }
             );
 
@@ -66,10 +66,10 @@ export default function ParticularDeliveryPage() {
 
     async function removeInvoice(invType: string, invNo: string) {
         try {
-            const res = await fetch(
-                `/api/delivery/remove?id=${id}&invId=${invType}${invNo}`,
-                { method: 'DELETE', credentials: 'include' }
-            );
+            const res = await fetch(`/api/deliveries/${deliveryId}/invoices/${invType}${invNo}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
 
             const json = await res.json();
             if (!res.ok) throw new Error(json.message);
@@ -83,13 +83,13 @@ export default function ParticularDeliveryPage() {
 
     useEffect(() => {
         fetchDelivery();
-    }, [id]);
+    }, [deliveryId]);
 
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed">
                 <div className="p-4 bg-blue-50 rounded-full mb-4">
-                    <Loader className="w-10 h-10 text-blue-500" />
+                    <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
                 </div>
                 <h3 className="text-slate-900 font-medium">Loading Delivery...</h3>
                 <p className="text-slate-500 text-sm">Please wait while the delivery details are being loaded.</p>
@@ -140,14 +140,14 @@ export default function ParticularDeliveryPage() {
                     <aside className="w-full lg:w-87.5 space-y-6">
                         {!delivery?.startedAt && (
                             <div className="">
-                                <AddInvoice deliveryId={id} onAdded={fetchDelivery} />
+                                <AddInvoice deliveryId={deliveryId} onAdded={fetchDelivery} />
                             </div>
                         )}
 
                         {!delivery?.endedAt && (
                             <div className='space-y-2'>
-                                <StartDeliveryButton disabled={invoices.length === 0 || !!(delivery?.startedAt)} deliveryId={id} onStarted={fetchDelivery} />
-                                <CompleteDeliveryButton disabled={!delivery?.startedAt || !!delivery?.endedAt} deliveryId={id} onStarted={fetchDelivery} />
+                                <StartDeliveryButton disabled={invoices.length === 0 || !!(delivery?.startedAt)} deliveryId={deliveryId} onStarted={fetchDelivery} />
+                                <CompleteDeliveryButton disabled={!delivery?.startedAt || !!delivery?.endedAt} deliveryId={deliveryId} onStarted={fetchDelivery} />
                             </div>
                         )}
 
@@ -263,7 +263,7 @@ export default function ParticularDeliveryPage() {
                         {loading ? (
                             <div className="flex flex-col items-center justify-center py-20 bg-white rounded-2xl border border-dashed">
                                 <div className="p-4 bg-slate-50 rounded-full mb-4">
-                                    <Loader2 className="w-10 h-10 text-slate-300" />
+                                    <Loader2 className="w-10 h-10 text-slate-300 animate-spin" />
                                 </div>
                                 <h3 className="text-slate-900 font-medium">Fetching Added Invoices</h3>
                                 <p className="text-slate-500 text-sm">Please wait while we load the invoices.</p>

@@ -3,27 +3,20 @@ import { cookies } from "next/headers";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
-export async function POST(request: NextRequest){
-
-    const body = await request.json();
-
-    const { remarks, id, location } = body;
+export async function GET(request: NextRequest, { params }: { params: Promise<{ deliveryId: string }> }){
 
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
-    const { searchParams } = new URL(request.url);
+    const { deliveryId } = await params;
 
     if (!token) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     try {
-        const response = await fetch(`${BACKEND_URL}/delivery/deliver/${id}`, {
-            method: "POST",
-            body: JSON.stringify({ remarks, location }),
+        const response = await fetch(`${BACKEND_URL}/deliveries/${deliveryId}`, {
             headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json", 
+                Authorization: `Bearer ${token}`
             }
         })
         const data = await response.json();

@@ -3,25 +3,23 @@ import { cookies } from "next/headers";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
-export async function GET(request: NextRequest){
+export async function POST(request: NextRequest, { params }: { params: Promise<{ deliveryId: string, invoiceId: string }> }){
 
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
-    const deliveryId = searchParams.get('deliveryId');
+    const { deliveryId, invoiceId } = await params;
 
     if (!token) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     try {
-        const response = await fetch(`${BACKEND_URL}/delivery/${deliveryId}/invoice/${id}`, {
+        const response = await fetch(`${BACKEND_URL}/deliveries/${deliveryId}/complete`, {
+            method: 'POST',
             headers: {
                 Authorization: `Bearer ${token}`
-            },
+            }
         })
-
         const data = await response.json();
 
         return NextResponse.json(data, { status: response.status });
@@ -31,5 +29,4 @@ export async function GET(request: NextRequest){
         }
         return NextResponse.json({ message: "Failed to fetch routes" }, { status: 500 });
     }
-
 }
