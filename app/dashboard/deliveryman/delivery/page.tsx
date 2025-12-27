@@ -29,7 +29,7 @@ export default function DeliveryPage() {
       const deliveryId = data.data.delivery.id;
 
       toast.success('New delivery run initialized');
-      router.push(`/dashboard/delivery/${deliveryId}`);
+      router.push(`/dashboard/deliveryman/delivery/${deliveryId}`);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Something went wrong');
       console.error(error);

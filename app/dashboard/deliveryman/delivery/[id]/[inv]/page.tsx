@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
     Receipt, User, Calendar, Truck, ArrowLeft, ExternalLink,
-    Clock, IndianRupee, MapPin, ChevronLeft, CircleX, Loader, Box, ShoppingBag, Snowflake, Archive
+    Clock, IndianRupee, MapPin, CircleX, Loader, Box, ShoppingBag, Snowflake, Archive
 } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -112,7 +112,7 @@ const InvoicePage = () => {
             <header className="sticky top-0 z-10 border-b bg-white/80 backdrop-blur-md px-6 py-4">
                 <div className="max-w-7xl mx-auto flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href={`/dashboard/delivery/${id}`} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                        <Link href={`/dashboard/deliveryman/delivery/${id}`} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
                             <ArrowLeft className="w-5 h-5 text-slate-600" />
                         </Link>
                         <div>

@@ -5,6 +5,7 @@ import { Loader2, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ArrowDownUp, PackageCheck, Plus, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 type Delivery = {
   id: string;
@@ -18,6 +19,8 @@ export default function DashboardPage() {
 
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const pathname = usePathname();
 
   useEffect(() => {
 
@@ -66,13 +69,13 @@ export default function DashboardPage() {
             <p className="text-slate-500 text-sm">Manage and track your pharmaceutical shipments</p>
           </div>
           <div className="flex items-center gap-3">
-            <Link href={'/dashboard/status'}>
+            <Link href={`${pathname}/status`}>
               <Button variant="outline" className="gap-2 bg-white">
                 <ArrowDownUp className="h-4 w-4" />
                 Order Status
               </Button>
             </Link>
-            <Link href={'/dashboard/delivery'}>
+            <Link href={`${pathname}/delivery`}>
               <Button className="gap-2 bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-200">
                 <Plus className="h-4 w-4" />
                 Create Delivery
@@ -95,7 +98,7 @@ export default function DashboardPage() {
           {deliveries.map((delivery) => (
             <Link
               key={delivery.id}
-              href={`/dashboard/delivery/${delivery.id}`}
+              href={`${pathname}/delivery/${delivery.id}`}
               className="group block p-5 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-blue-500 hover:shadow-md transition-all active:scale-[0.98]"
             >
               <div className="flex justify-between items-start">
