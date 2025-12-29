@@ -20,6 +20,7 @@ type InvoiceData = {
     invNo: string;
     amount: number;
     customerName: string;
+    customerPhone: string;
     status: string;
     createdAt: string;
     deliveredAt: string | null;
@@ -63,9 +64,10 @@ const InvoicePage = () => {
             const res = await fetch(`/api/deliveries/${deliveryId}/invoices/${invoiceId}`);
             const json = await res.json();
 
-            if(!res.ok) throw new Error(json.message || 'Failed to fetch invoice');
+            if (!res.ok) throw new Error(json.message || 'Failed to fetch invoice');
 
-            if (json.success){setData(json.data);
+            if (json.success) {
+                setData(json.data);
                 setPackaging({
                     boxes: json.data.boxes,
                     bags: json.data.bags,
@@ -159,7 +161,13 @@ const InvoicePage = () => {
                                 </div>
                                 <div className="flex-1 overflow-hidden">
                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Customer</p>
-                                    <p className="font-bold text-slate-900 truncate">{data.customerName}</p>
+                                    <p className="font-bold text-slate-900">{data.customerName}</p>
+                                    {data.customerPhone && (
+                                        <>
+                                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Phone</p>
+                                            <p className="font-bold text-slate-900 truncate">{data.customerPhone}</p>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                             <div className="pt-4 border-t border-slate-50">
@@ -182,7 +190,7 @@ const InvoicePage = () => {
                 </div>
 
 
-                    <PackagingSection packaging={packaging} />
+                <PackagingSection packaging={packaging} />
 
                 <div>
                     <DeliverInvoiceButton onSuccess={fetchInvoice} delivered={!!data.deliveredAt} invoiceId={String(invoiceId)} deliveryId={String(deliveryId)} />
@@ -299,8 +307,8 @@ const PackagingSection = ({ packaging }: { packaging: Packaging | null }) => {
             <CardContent className="p-0">
                 <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-slate-100">
                     {items.map((item) => (
-                        <div 
-                            key={item.label} 
+                        <div
+                            key={item.label}
                             className={cn(
                                 "flex flex-col items-center justify-center py-4 px-2 transition-colors",
                                 item.value > 0 ? "bg-green-50/30" : "opacity-40"
