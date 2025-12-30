@@ -11,7 +11,7 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import DeliverInvoiceButton from "../../../../../../components/deliveryman/deliver"
+import DeliverInvoiceButton from "@/components/deliveryman/deliver"
 import Image from "next/image"
 
 type InvoiceData = {
@@ -183,7 +183,7 @@ const InvoicePage = () => {
                     <Card className="border-slate-200 shadow-sm">
                         <CardContent className="space-y-4">
                             <DetailRow icon={<Truck className="w-4 h-4" />} label="Run ID" value={data.delivery.deliveryNo} />
-                            <DetailRow icon={<Calendar className="w-4 h-4" />} label="Date" value={new Date(data.createdAt).toLocaleDateString()} />
+                            <DetailRow icon={<Calendar className="w-4 h-4" />} label="Date" value={new Date(data.createdAt).toLocaleDateString('en-GB')} />
                             <DetailRow icon={<MapPin className="w-4 h-4" />} label="Delivery Location" value={data.location} isLocation />
                         </CardContent>
                     </Card>
