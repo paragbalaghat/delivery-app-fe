@@ -232,14 +232,14 @@ const InvoicePage = () => {
                                         icon={<Truck />}
                                         title="Out for Delivery"
                                         desc="Shipment left the facility"
-                                        time={data.delivery.startedAt ? new Date(data.delivery.startedAt).toLocaleString() : "Awaiting Dispatch"}
+                                        time={data.delivery.startedAt ? new Date(data.delivery.startedAt).toLocaleString('en-GB') : "Awaiting Dispatch"}
                                         isDone={!!data.delivery.startedAt}
                                     />
                                     <TimelineNode
                                         icon={<Clock />}
                                         title="Customer Delivery"
                                         desc="Handed over to customer"
-                                        time={data.deliveredAt ? new Date(data.deliveredAt).toLocaleString() : "Pending Completion"}
+                                        time={data.deliveredAt ? new Date(data.deliveredAt).toLocaleString('en-GB') : "Pending Completion"}
                                         isDone={!!data.deliveredAt}
                                         isLast
                                     />

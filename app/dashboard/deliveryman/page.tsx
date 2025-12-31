@@ -120,10 +120,10 @@ export default function DashboardPage() {
                   {delivery.invoiceCount} Invoices
                 </div>
                 {delivery.startedAt && !delivery.endedAt && (
-                  <span>Started {new Date(delivery.startedAt).toLocaleString()}</span>
+                  <span>Started {new Date(delivery.startedAt).toLocaleString('en-GB')}</span>
                 )}
                 {delivery.endedAt && (
-                  <span>Ended {new Date(delivery.endedAt).toLocaleString()}</span>
+                  <span>Ended {new Date(delivery.endedAt).toLocaleString('en-GB')}</span>
                 )}
               </div>
             </Link>

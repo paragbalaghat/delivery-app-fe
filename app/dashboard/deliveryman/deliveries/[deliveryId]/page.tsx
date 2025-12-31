@@ -173,7 +173,7 @@ export default function ParticularDeliveryPage() {
                                             </div>
 
                                             <p className="text-sm text-slate-500 leading-relaxed">
-                                                This run was finalized on <span className="font-semibold text-slate-700">{new Date(delivery.endedAt).toLocaleString()}</span>.
+                                                This run was finalized on <span className="font-semibold text-slate-700">{new Date(delivery.endedAt).toLocaleString('en-GB')}</span>.
                                                 All logs have been synced to the primary database.
                                             </p>
                                         </div>
