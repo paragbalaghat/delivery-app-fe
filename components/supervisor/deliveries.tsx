@@ -109,9 +109,9 @@ export function UserDeliveriesCard({ userId }: { userId: string }) {
                     
                     {/* Status Chips */}
                     <div className="flex flex-col items-end gap-1.5">
-                      {isActive && (
+                      {delivery.startedAt && !delivery.endedAt && (
                         <span className="text-[9px] font-black text-blue-600 bg-blue-100/50 border border-blue-200 px-2 py-1 rounded-md uppercase tracking-tighter animate-pulse">
-                          Live Trip
+                          Out for Delivery
                         </span>
                       )}
                       {isCompleted && (
@@ -131,8 +131,8 @@ export function UserDeliveriesCard({ userId }: { userId: string }) {
                   <div className="flex items-center gap-4">
                     <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div 
-                        className={`h-full rounded-full ${isFailed ? 'bg-amber-400' : isCompleted ? 'bg-emerald-500' : 'bg-blue-500 animate-shimmer'}`} 
-                        style={{ width: isCompleted ? '100%' : '65%' }}
+                        className={`h-full rounded-full ${isFailed ? 'bg-red-400' : isCompleted ? 'bg-emerald-500' : 'bg-blue-500 animate-shimmer'}`} 
+                        style={{ width: isCompleted || isFailed ? '100%' : '65%' }}
                       />
                     </div>
                     <div className="flex items-center gap-1">

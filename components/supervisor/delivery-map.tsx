@@ -71,7 +71,7 @@ export default function DeliveryMap({ invoices }: { invoices: Invoice[] }) {
         }
     }, [points]);
 
-    if (!isLoaded || points.length === 0) {
+    if (!isLoaded) {
         return (
             <div className="w-full h-110 bg-slate-100 animate-pulse rounded-xl flex items-center justify-center">
                 <p className="text-slate-400">Loading Map...</p>
@@ -79,10 +79,18 @@ export default function DeliveryMap({ invoices }: { invoices: Invoice[] }) {
         );
     }
 
+    if (points.length === 0) {
+        return (
+            <div className="w-full h-110 bg-slate-100 animate-pulse rounded-xl flex items-center justify-center">
+                <p className="text-slate-400">No delivery locations available.</p>
+            </div>
+        );
+    }
+
     return (
         <div className="relative group overflow-hidden rounded-xl border border-slate-200 shadow-md">
             {/* Header Overlay */}
-            <div className="absolute top-3 left-3 z-10 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow-sm border border-slate-200">
+            <div className="absolute bottom-3 left-3 z-10 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow-sm border border-slate-200">
                 <p className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                     Delivery Route • {points.length} Stops
                 </p>
@@ -99,9 +107,14 @@ export default function DeliveryMap({ invoices }: { invoices: Invoice[] }) {
                 <Polyline
                     path={points.map(p => ({ lat: p.lat, lng: p.lng }))}
                     options={{
-                        strokeColor: '#FF0000',
+                        strokeColor: '#FF0000', // Red
                         strokeOpacity: 0.8,
                         strokeWeight: 4,
+                        icons: [{
+                            icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW },
+                            offset: '50%',
+                            repeat: '100px'
+                        }]
                     }}
                 />
 
