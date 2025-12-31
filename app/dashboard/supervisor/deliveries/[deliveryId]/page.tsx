@@ -244,7 +244,7 @@ export default function ParticularDeliveryPage() {
 
                     {/* 3. RIGHT CONTENT: Invoice Grid */}
                     <section className="flex-1 space-y-6">
-                        {invoices.length > 0 && (
+                        {invoices.length > 0 && delivery?.endedAt && (
                             <div>
                                 <h2 className="text-lg font-semibold text-slate-800 mb-2">
                                     Delivery Route

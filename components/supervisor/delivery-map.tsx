@@ -99,14 +99,9 @@ export default function DeliveryMap({ invoices }: { invoices: Invoice[] }) {
                 <Polyline
                     path={points.map(p => ({ lat: p.lat, lng: p.lng }))}
                     options={{
-                        strokeColor: '#10b981', // Emerald 500
+                        strokeColor: '#FF0000',
                         strokeOpacity: 0.8,
                         strokeWeight: 4,
-                        icons: [{
-                            icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW },
-                            offset: '50%',
-                            repeat: '100px'
-                        }]
                     }}
                 />
 
