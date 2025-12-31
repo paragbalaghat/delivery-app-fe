@@ -2,8 +2,13 @@
 
 import React, { useMemo, useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { User2, Loader2, TrendingUp, PieChart as PieIcon } from "lucide-react";
+import { User2, Loader2, TrendingUp, PieChart as PieIcon, CalendarIcon } from "lucide-react";
 import { motion, Variants } from "framer-motion";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from '@/lib/utils';
 
 interface Delivery {
   id: string;
@@ -17,10 +22,13 @@ const COLORS = ['#2563eb', '#10b981', '#3b82f6', '#059669', '#60a5fa', '#34d399'
 function DeliveryPersonnelChart() {
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
   async function fetchDeliveries() {
+    if (!date) return;
     try {
-      const response = await fetch('/api/deliveries/success');
+      const formattedDate = format(date, "yyyy-MM-dd");
+      const response = await fetch(`/api/deliveries/success?date=${formattedDate}`);
       const json = await response.json();
       setDeliveries(json.data || []);
     } catch (error) {
@@ -32,7 +40,7 @@ function DeliveryPersonnelChart() {
 
   useEffect(() => {
     fetchDeliveries();
-  }, []);
+  }, [date]);
 
   const chartData = useMemo(() => {
     return deliveries.map(d => ({
@@ -61,19 +69,46 @@ function DeliveryPersonnelChart() {
       className="w-full h-120 bg-white border border-gray-200 rounded-[24px] overflow-hidden flex flex-col shadow-sm"
     >
       {/* Header Section */}
-      <div className="bg-gray-50 p-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-white/20 rounded-xl backdrop-blur-md">
-            <PieIcon className="h-5 w-5 text-slate-500" />
+      <div className="bg-gray-50 p-6 flex flex-col gap-4">
+        <div className='flex items-center justify-between'>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-white/20 rounded-xl backdrop-blur-md">
+              <PieIcon className="h-5 w-5 text-slate-500" />
+            </div>
+            <div>
+              <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">Distribution</h3>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Today's Performance</p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">Distribution</h3>
-            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Today's Performance</p>
+          <div className="flex items-center gap-2 bg-green-400/20 px-3 py-1 rounded-full border border-green-400/30 shadow-sm">
+            <TrendingUp className="h-3 w-3 text-green-600" />
+            <span className="text-[10px] font-black text-green-600 uppercase tracking-widest">Live</span>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-green-400/20 px-3 py-1 rounded-full border border-green-400/30 shadow-sm">
-          <TrendingUp className="h-3 w-3 text-green-600" />
-          <span className="text-[10px] font-black text-green-600 uppercase tracking-widest">Live</span>
+        <div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-full justify-start text-left font-bold text-xs rounded-xl h-10 border-gray-200 hover:bg-white hover:border-green-500",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4 text-green-600" />
+                {date ? format(date, "PPP") : <span>Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 rounded-2xl overflow-hidden" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+                className="rounded-2xl border-none"
+              />
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 

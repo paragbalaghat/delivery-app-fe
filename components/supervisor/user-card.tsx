@@ -71,7 +71,7 @@ export function UserInfoCard({ userId }: { userId: string }) {
       className="w-full bg-white border border-gray-200 rounded-[24px] overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 h-full"
     >
       {/* Header Bar - Solid green */}
-      <div className="h-20 bg-green-600 px-6 relative">
+      <div className="h-20 bg-gray-50 px-6 relative">
         <div className="absolute -bottom-8 left-6">
           <div className="h-16 w-16 rounded-2xl bg-white border-4 border-white shadow-sm flex items-center justify-center overflow-hidden">
             <div className="h-full w-full bg-green-50 flex items-center justify-center text-green-600 font-black text-2xl">
@@ -80,8 +80,8 @@ export function UserInfoCard({ userId }: { userId: string }) {
           </div>
         </div>
         <div className="absolute top-4 right-6">
-          <span className="bg-white/20 text-white text-[10px] font-black px-3 py-1 rounded-full border border-white/20 uppercase tracking-widest flex items-center gap-1.5 backdrop-blur-md">
-            <div className="h-1 w-1 rounded-full bg-green-400 animate-pulse" />
+          <span className="bg-green-50 text-green-600 text-[10px] font-black px-3 py-1 rounded-full border border-green-200 uppercase tracking-widest flex items-center gap-1.5 backdrop-blur-md shadow-xs">
+            <div className="h-1 w-1 rounded-full bg-green-600 animate-pulse" />
             Delivery Executive
           </span>
         </div>

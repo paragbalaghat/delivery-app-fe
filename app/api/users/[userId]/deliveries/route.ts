@@ -8,13 +8,15 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
     const { userId } = await params;
+    const { searchParams } = new URL(request.url);
+    const date = searchParams.get('date');
 
     if (!token) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     try {
-        const response = await fetch(`${BACKEND_URL}/users/${userId}/deliveries`, {
+        const response = await fetch(`${BACKEND_URL}/users/${userId}/deliveries?date=${date}`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
