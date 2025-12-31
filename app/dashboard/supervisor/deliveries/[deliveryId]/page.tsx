@@ -138,35 +138,38 @@ export default function ParticularDeliveryPage() {
             <main className="max-w-7xl mx-auto p-6">
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* 2. LEFT SIDEBAR: Actions (Fixed width on desktop) */}
-                    {delivery?.endedAt && (
+                    {delivery && (
                         <aside className="w-full lg:w-87.5 space-y-6">
                             <div>
-                                <div className="relative overflow-hidden bg-white border border-emerald-100 rounded-xl shadow-sm">
-                                    {/* Success Accent Bar */}
-                                    <div className="h-1 bg-emerald-500 w-full" />
+                                {delivery.endedAt && (
 
-                                    <div className="p-5 flex flex-col sm:flex-row gap-4 items-start">
-                                        {/* Icon Section */}
-                                        <div className="shrink-0 w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100">
-                                            <CheckCircle2 className="w-6 h-6 text-emerald-600" />
-                                        </div>
+                                    <div className="relative overflow-hidden bg-white border border-emerald-100 rounded-xl shadow-sm">
+                                        {/* Success Accent Bar */}
+                                        <div className="h-1 bg-emerald-500 w-full" />
 
-                                        {/* Content Section */}
-                                        <div className="flex-1 space-y-1">
-                                            <div className="flex items-center gap-2">
-                                                <h3 className="font-bold text-slate-900">Shipment Completed</h3>
-                                                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-wider">
-                                                    Archived
-                                                </span>
+                                        <div className="p-5 flex flex-col sm:flex-row gap-4 items-start">
+                                            {/* Icon Section */}
+                                            <div className="shrink-0 w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100">
+                                                <CheckCircle2 className="w-6 h-6 text-emerald-600" />
                                             </div>
 
-                                            <p className="text-sm text-slate-500 leading-relaxed">
-                                                This run was finalized on <span className="font-semibold text-slate-700">{new Date(delivery.endedAt).toLocaleString()}</span>.
-                                                All logs have been synced to the primary database.
-                                            </p>
+                                            {/* Content Section */}
+                                            <div className="flex-1 space-y-1">
+                                                <div className="flex items-center gap-2">
+                                                    <h3 className="font-bold text-slate-900">Shipment Completed</h3>
+                                                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-wider">
+                                                        Archived
+                                                    </span>
+                                                </div>
+
+                                                <p className="text-sm text-slate-500 leading-relaxed">
+                                                    This run was finalized on <span className="font-semibold text-slate-700">{new Date(delivery.endedAt).toLocaleString()}</span>.
+                                                    All logs have been synced to the primary database.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                )}
                                 {/* Failed Deliveries Sub-Section */}
                                 {delivery.failedDeliveries && delivery.failedDeliveries.length > 0 && (
                                     <div className="mt-4 p-3 bg-red-50/50 border border-red-100 rounded-lg">
@@ -191,30 +194,63 @@ export default function ParticularDeliveryPage() {
                                     <Timer className="absolute -right-2 -top-2 w-24 h-24 text-slate-50 opacity-[0.03] -rotate-12" />
 
                                     <div className="relative flex flex-col gap-4">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                                <div className={cn(
-                                                    "p-2 rounded-lg",
-                                                    delivery?.endedAt ? "bg-slate-100 text-slate-600" : "bg-green-50 text-green-600"
-                                                )}>
-                                                    <Timer className="w-5 h-5" />
+                                        <div className="flex flex-col gap-4 bg-white p-4 rounded-xl border border-slate-200">
+                                            {/* Header Section */}
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={cn(
+                                                        "p-2 rounded-lg",
+                                                        delivery?.endedAt ? "bg-slate-100 text-slate-600" : "bg-green-50 text-green-600"
+                                                    )}>
+                                                        <Timer className="w-5 h-5" />
+                                                    </div>
+                                                    <div>
+                                                        <h2 className="text-sm font-bold text-slate-900 leading-none">
+                                                            {delivery?.endedAt ? "Total Duration" : "Time Elapsed"}
+                                                        </h2>
+                                                        <p className="text-[11px] text-slate-500 mt-1 uppercase tracking-wider font-medium">
+                                                            {delivery?.endedAt ? "Delivery Completed" : "Live Tracking"}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <h2 className="text-sm font-bold text-slate-900 leading-none">
-                                                        {delivery?.endedAt ? "Total Duration" : "Time Elapsed"}
-                                                    </h2>
-                                                    <p className="text-[11px] text-slate-500 mt-1 uppercase tracking-wider font-medium">
-                                                        {delivery?.endedAt ? "Delivery Completed" : "Live Tracking"}
+
+                                                {!delivery?.endedAt && (
+                                                    <div className="flex items-center gap-2 px-2 py-1 bg-green-50 rounded-full">
+                                                        <span className="relative flex h-2 w-2">
+                                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-600"></span>
+                                                        </span>
+                                                        <span className="text-[10px] font-bold text-green-700 uppercase">Live</span>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Time Details Section */}
+                                            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-50">
+                                                <div className="relative pl-4 border-l-2 border-blue-500">
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Started At</p>
+                                                    <p className="text-sm font-semibold text-slate-700">
+                                                        {delivery?.startedAt ? new Date(delivery.startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                                                    </p>
+                                                </div>
+
+                                                <div className={cn(
+                                                    "relative pl-4 border-l-2",
+                                                    delivery?.endedAt ? "border-emerald-500" : "border-slate-200"
+                                                )}>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+                                                        {delivery?.endedAt ? "Finished At" : "Estimated End"}
+                                                    </p>
+                                                    <p className={cn(
+                                                        "text-sm font-semibold",
+                                                        delivery?.endedAt ? "text-slate-700" : "text-slate-400 italic"
+                                                    )}>
+                                                        {delivery?.endedAt
+                                                            ? new Date(delivery.endedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                                                            : 'In Progress...'}
                                                     </p>
                                                 </div>
                                             </div>
-
-                                            {!delivery?.endedAt && (
-                                                <span className="flex h-2 w-2">
-                                                    <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
-                                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-600"></span>
-                                                </span>
-                                            )}
                                         </div>
 
                                         <div className="flex items-baseline gap-2">
@@ -244,7 +280,7 @@ export default function ParticularDeliveryPage() {
 
                     {/* 3. RIGHT CONTENT: Invoice Grid */}
                     <section className="flex-1 space-y-6">
-                        {invoices.length > 0 && delivery?.startedAt &&(
+                        {invoices.length > 0 && delivery?.startedAt && (
                             <div>
                                 <h2 className="text-lg font-semibold text-slate-800 mb-2">
                                     Delivery Route
