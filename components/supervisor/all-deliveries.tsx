@@ -80,7 +80,7 @@ export function AllDeliveriesCard() {
     }, [date]);
 
     return (
-        <div className="w-full bg-white border border-gray-200 rounded-[24px] overflow-hidden flex flex-col shadow-sm h-full">
+        <div className="w-full bg-white border border-gray-200 rounded-[24px] overflow-hidden flex flex-col shadow-sm max-h-full">
             {/* Header Section */}
             <div className="bg-gray-50 p-6">
                 <div className="flex items-center justify-between mb-4">
@@ -161,6 +161,9 @@ export function AllDeliveriesCard() {
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-xs font-black text-gray-900 tracking-tighter bg-gray-100 px-2 py-0.5 rounded">
                                                         #{delivery.deliveryNo}
+                                                    </span>
+                                                    <span className="text-xs font-black text-gray-900 tracking-tighter bg-gray-100 px-2 py-0.5 rounded">
+                                                        {delivery.deliveryMan}
                                                     </span>
                                                 </div>
                                                 <div className="flex items-center gap-1.5 text-gray-400">

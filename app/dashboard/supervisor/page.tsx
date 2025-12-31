@@ -6,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import DeliveryPersonnelChart from "@/components/supervisor/pie-chart";
 import FailedDeliveriesSection from "@/components/supervisor/failed-deliveries";
 import UsersCard from "@/components/supervisor/users";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function DashboardPage() {
 
@@ -18,7 +20,16 @@ export default function DashboardPage() {
                         <p className="text-slate-500 text-sm">Supervisor</p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className="text-sm text-slate-600">Welcome back, Supervisor!</span>
+                        <Button variant="outline" className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100">
+                            <Link href="/dashboard/supervisor/deliveries" className="flex gap-2">
+                                <CheckCircle2 className="h-4 w-4" />
+                                <span className="text-xs font-bold">All Deliveries</span>
+                            </Link>
+                        </Button>
+                        {/* <Button variant="outline" className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100">
+                            <User className="h-4 w-4 mr-2" />
+                            <span className="text-xs font-bold">Active Personnel</span>
+                        </Button> */}
                     </div>
                 </div>
             </header>
