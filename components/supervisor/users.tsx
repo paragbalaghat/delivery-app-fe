@@ -1,11 +1,18 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Loader2, ChevronRight, Search, Phone, Fingerprint } from "lucide-react";
+import {
+  Users,
+  Loader2,
+  ChevronRight,
+  Search,
+  Phone,
+  Fingerprint,
+  UserCheck
+} from "lucide-react";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Input } from "@/components/ui/input";
+import { motion, Variants } from "motion/react";
 
 type User = {
   id: string;
@@ -15,17 +22,20 @@ type User = {
   phone: string;
 }
 
-const dummyUsers = Array.from({ length: 10 }, (_, i) => ({
-  id: `user-${i + 1}`,
-  name: `User ${i + 1}`,
-  email: `user${i + 1}@example.com`,
-  esId: `ES${1000 + i}`,
-  phone: `+1234567890${i}`
-}));
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+};
 
-function UsersCard() {
+const itemVariants: Variants = {
+  hidden: { x: -10, opacity: 0 },
+  visible: { x: 0, opacity: 1 }
+};
+
+export function UsersCard() {
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const pathname = usePathname();
 
@@ -44,71 +54,102 @@ function UsersCard() {
     fetchUsers();
   }, []);
 
+  const filteredUsers = useMemo(() => {
+    return users.filter(user =>
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.esId.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery, users]);
+
   if (loading) {
     return (
-      <Card className="border-slate-200 shadow-sm h-full flex items-center justify-center">
-        <div className="flex flex-col items-center gap-2">
-          <Loader2 className="animate-spin h-8 w-8 text-blue-500" />
-          <p className="text-sm text-slate-500 font-medium">Loading team...</p>
-        </div>
-      </Card>
+      <div className="w-full h-120 bg-white border border-gray-200 rounded-[24px] flex flex-col items-center justify-center gap-3">
+        <Loader2 className="animate-spin h-8 w-8 text-green-600" />
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Loading Personnel...</p>
+      </div>
     );
   }
 
   return (
-    <Card className="border-slate-200 shadow-lg shadow-slate-200/50 overflow-hidden flex flex-col min-h-full pt-0">
-      <CardHeader className="border-b bg-white p-4 space-y-4">
-        <div className="flex items-center justify-between">
+    <div className="w-full bg-white border border-gray-200 rounded-[24px] overflow-hidden flex flex-col shadow-sm min-h-100 h-120">
+      {/* Header - Matches your Profile/Trip UI */}
+      <div className="bg-gray-50 p-6">
+        <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-50 rounded-lg">
-              <Users className="h-5 w-5 text-blue-600" />
+            <div className="p-2 bg-white/20 rounded-xl backdrop-blur-md text-slate-500">
+              <Users className="h-5 w-5" />
             </div>
             <div>
-              <CardTitle className="text-lg font-bold text-slate-900 tracking-tight">
-                Delivery Team
-              </CardTitle>
-              <p className="text-xs text-slate-500 font-medium">{users.length} registered personnel</p>
+              <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">Delivery Team</h3>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{users.length} Personnel</p>
             </div>
           </div>
+          <div className="h-8 w-8 rounded-full bg-green-400/20 border border-green-400/30 flex items-center justify-center shadow-sm">
+            <UserCheck className="h-4 w-4 text-green-600" />
+          </div>
         </div>
-      </CardHeader>
 
-      <CardContent className="p-0 flex-1 overflow-y-auto scrollbar-thin h-20 scrollbar-thumb-slate-200">
-        {users.length > 0 ? (
-          <div className="flex flex-col gap-4 divide-slate-50">
-            {users.map((user) => (
+        {/* Search Input inside Header */}
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by name or ID..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-white border border-slate-500/20 rounded-xl py-2 pl-9 pr-4 text-xs text-slate-900 placeholder:text-slate-400 outline-none focus:bg-white/20 transition-all font-medium"
+          />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto max-h-150 scrollbar-hide">
+        {filteredUsers.length > 0 ? (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="divide-y divide-gray-50"
+          >
+            {filteredUsers.map((user) => (
               <Link key={user.id} href={`${pathname}/users/${user.id}`}>
-                <div className="group flex items-center justify-between py-3 px-4 hover:bg-blue-50/50 transition-all cursor-pointer">
+                <motion.div
+                  variants={itemVariants}
+                  className="group flex items-center justify-between py-4 px-6 hover:bg-blue-50/50 transition-all cursor-pointer border-l-4 border-transparent hover:border-blue-600"
+                >
                   <div className="flex items-center gap-4">
-                    <div className="space-y-0.5">
-                      <p className="text-sm font-semibold text-slate-900 group-hover:text-blue-700 transition-colors">
+                    <div className="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center text-blue-600 font-black text-sm group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                      {user.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-black text-gray-900 leading-tight">
                         {user.name}
                       </p>
-                      <div className="flex items-center gap-3">
-                        <span className="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
-                          <Fingerprint className="h-3 w-3" /> {user.esId}
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="flex items-center gap-1 text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
+                          <Fingerprint className="h-3 w-3 text-green-500" /> #{user.esId}
                         </span>
-                        <span className="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
-                          <Phone className="h-3 w-3" /> {user.phone}
+                        <span className="flex items-center gap-1 text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
+                          <Phone className="h-3 w-3 text-blue-500" /> {user.phone}
                         </span>
                       </div>
                     </div>
                   </div>
-                  <div className="p-2 rounded-full group-hover:bg-blue-100 transition-colors">
-                    <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-blue-600 transition-transform group-hover:translate-x-1" />
-                  </div>
-                </div>
+                  <ChevronRight className="h-4 w-4 text-gray-300 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+                </motion.div>
               </Link>
             ))}
-          </div>
+          </motion.div>
         ) : (
-          <div className="flex flex-col items-center justify-center min-h-full text-slate-400 py-10">
-            <Search className="h-10 w-10 mb-2 opacity-10" />
-            <p className="text-sm font-medium">No team members found</p>
+          <div className="flex flex-col items-center justify-center py-20 px-10 text-center">
+            <div className="p-6 bg-gray-50 rounded-full mb-4 border border-dashed border-gray-200">
+              <Search className="h-10 w-10 text-gray-300" />
+            </div>
+            <h4 className="text-gray-900 font-bold text-sm">No Members Found</h4>
+            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Try a different search term</p>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 

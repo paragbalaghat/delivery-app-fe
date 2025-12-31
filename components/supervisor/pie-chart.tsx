@@ -2,8 +2,8 @@
 
 import React, { useMemo, useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User2 } from "lucide-react";
+import { User2, Loader2, TrendingUp, PieChart as PieIcon } from "lucide-react";
+import { motion, Variants } from "framer-motion";
 
 interface Delivery {
   id: string;
@@ -11,7 +11,8 @@ interface Delivery {
   invoicesDelivered: number;
 }
 
-const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444'];
+// Strictly Blue and Green palette
+const COLORS = ['#2563eb', '#10b981', '#3b82f6', '#059669', '#60a5fa', '#34d399'];
 
 function DeliveryPersonnelChart() {
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
@@ -44,37 +45,62 @@ function DeliveryPersonnelChart() {
     return deliveries.reduce((sum, d) => sum + d.invoicesDelivered, 0);
   }, [deliveries]);
 
-  return (
-    <Card className="flex flex-col border-slate-200 shadow-sm overflow-hidden">
-      <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-semibold text-slate-800">
-            Today's Delivery Distribution
-          </CardTitle>
-          <User2 className="h-4 w-4 text-slate-400" />
-        </div>
-      </CardHeader>
+  if (loading) {
+    return (
+      <div className="w-full h-120 bg-white border border-gray-200 rounded-[24px] flex flex-col items-center justify-center gap-3">
+        <Loader2 className="animate-spin h-8 w-8 text-blue-600" />
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Generating Insights...</p>
+      </div>
+    );
+  }
 
-      <CardContent className="relative h-80 w-full pb-4">
+  return (
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      className="w-full h-120 bg-white border border-gray-200 rounded-[24px] overflow-hidden flex flex-col shadow-sm"
+    >
+      {/* Header Section */}
+      <div className="bg-gray-50 p-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-white/20 rounded-xl backdrop-blur-md">
+            <PieIcon className="h-5 w-5 text-slate-500" />
+          </div>
+          <div>
+            <h3 className="text-sm font-black text-slate-900 uppercase tracking-tight">Distribution</h3>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Today's Performance</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 bg-green-400/20 px-3 py-1 rounded-full border border-green-400/30 shadow-sm">
+          <TrendingUp className="h-3 w-3 text-green-600" />
+          <span className="text-[10px] font-black text-green-600 uppercase tracking-widest">Live</span>
+        </div>
+      </div>
+
+      <div className="p-6 relative h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Tooltip
               contentStyle={{
                 backgroundColor: '#fff',
-                borderRadius: '8px',
-                border: '1px solid #e2e8f0',
-                fontSize: '12px',
+                borderRadius: '16px',
+                border: '1px solid #e5e7eb',
+                fontSize: '11px',
+                fontWeight: 'bold',
+                boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
               }}
+              itemStyle={{ color: '#111827' }}
             />
             <Pie
               data={chartData}
               dataKey="value"
               nameKey="name"
-              innerRadius={70}
-              outerRadius={90}
-              paddingAngle={8}
+              innerRadius={85}
+              outerRadius={110}
+              paddingAngle={6}
               stroke="none"
-              animationDuration={800}
+              animationBegin={200}
+              animationDuration={1200}
             >
               {chartData.map((_, index) => (
                 <Cell
@@ -87,23 +113,47 @@ function DeliveryPersonnelChart() {
             <Legend
               verticalAlign="bottom"
               align="center"
-              iconType="circle"
-              wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
+              iconType="rect"
+              formatter={(value) => (
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tighter mr-2">
+                  {value}
+                </span>
+              )}
+              wrapperStyle={{ paddingTop: '20px' }}
             />
           </PieChart>
         </ResponsiveContainer>
 
-        {/* Center total */}
-        <div className="absolute top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-          <p className="text-3xl font-bold text-slate-900 leading-none">
-            {loading ? '...' : totalDelivered}
+        {/* Center Text Stats */}
+        <div className="absolute top-[44%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="text-5xl font-black text-gray-900 leading-none tracking-tighter"
+          >
+            {totalDelivered}
+          </motion.p>
+          <p className="text-[10px] uppercase font-black text-green-600 mt-2 tracking-widest">
+            Delivered
           </p>
-          <p className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold mt-1">
-            {!loading && (totalDelivered === 1 ? 'Invoice Delivered' : 'Invoices Delivered')}
-          </p>
+          <div className="mt-1 h-1 w-8 bg-blue-600 mx-auto rounded-full" />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* Summary Footer */}
+      <div className="bg-gray-50 border-t border-gray-100 p-4 px-6 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <User2 className="h-4 w-4 text-gray-400" />
+          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+            {chartData.length} Personnel Active
+          </span>
+        </div>
+        <button className="text-[10px] font-black text-blue-600 uppercase hover:underline">
+          Full Report
+        </button>
+      </div>
+    </motion.div>
   );
 }
 

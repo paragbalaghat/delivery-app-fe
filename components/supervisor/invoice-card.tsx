@@ -1,12 +1,8 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Trash2, User, Package, FileText, ArrowRight } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
+import { User, FileText, ArrowRight, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { start } from 'repl';
+import { motion } from 'framer-motion';
 
 type Invoice = {
   invType: string;
@@ -15,56 +11,53 @@ type Invoice = {
   status: string;
 };
 
-export default function InvoiceCard({
-  invoice,
-  onDelete,
-  showDeleteInvoice = true,
-  started,
-  ended,
-}: {
-  invoice: Invoice;
-  onDelete: (invType: string, invNo: string) => void;
-  showDeleteInvoice?: boolean;
-  started?: boolean;
-  ended?: boolean;
-}) {
-
-  const pathname = usePathname();
-
-  const getStatusColor = (status: string) => {
-    if (status === 'ASSIGNED') return 'bg-yellow-50 text-yellow-800 border border-yellow-200';
-    else if (status === 'OUT_FOR_DELIVERY') return 'bg-cyan-50 text-cyan-800 border border-cyan-200';
-    else if (status === 'DELIVERED') return 'bg-green-50 text-green-800 border border-green-200';
-    else if (status === 'FAILED') return 'bg-red-50 text-red-800 border border-red-200';
-    return 'bg-slate-400';
-  };
+export default function InvoiceCard({ invoice }: { invoice: Invoice }) {
+  const isDelivered = invoice.status === 'DELIVERED';
+  const isFailed = invoice.status === 'FAILED';
+  const isPending = invoice.status === 'OUT_FOR_DELIVERY';
 
   return (
-    <Link href={`/dashboard/supervisor/invoice/${invoice.invType}${invoice.invNo}`} className="block w-full">
-    <div className={`bg-white border border-slate-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow ${invoice.status === 'DELIVERED' && !ended ? 'opacity-50' : 'opacity-100'}`}>
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-sm font-bold text-slate-900">
-            {invoice.invType}/{invoice.invNo}
-          </span>
-        </div>
-      </div>
+    <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}>
+      <Link href={`/dashboard/supervisor/invoice/${invoice.invType}${invoice.invNo}`}>
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 hover:border-blue-500 transition-colors group shadow-sm">
+          
+          {/* Header: ID and Status */}
+          <div className="flex justify-between items-start mb-3">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-blue-600" />
+              <span className="font-bold text-gray-900 text-sm">
+                {invoice.invType}/{invoice.invNo}
+              </span>
+            </div>
+            
+            <div className={`flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
+              isDelivered ? 'bg-green-50 text-green-700 border-green-100' : 
+              isFailed ? 'bg-red-50 text-red-700 border-red-100' : 
+              'bg-blue-50 text-blue-700 border-blue-100'
+            }`}>
+              {isDelivered && <CheckCircle2 className="h-3 w-3" />}
+              {isPending && <Clock className="h-3 w-3 animate-pulse" />}
+              {isFailed && <AlertCircle className="h-3 w-3" />}
+              {invoice.status.replace(/_/g, ' ')}
+            </div>
+          </div>
 
-      <div className="space-y-1.5">
-        <div className="flex items-center gap-2 text-slate-600">
-          <User className="h-3.5 w-3.5 opacity-70" />
-          <p className="text-sm font-medium leading-none truncate">
-            {invoice.customerName}
-          </p>
+          {/* Body: Customer */}
+          <div className="mb-4">
+            <p className="text-[10px] text-gray-400 font-bold uppercase mb-0.5">Customer</p>
+            <div className="flex items-center gap-2">
+              <User className="h-3.5 w-3.5 text-gray-300" />
+              <p className="text-sm font-bold text-gray-700 truncate">{invoice.customerName}</p>
+            </div>
+          </div>
+
+          {/* Footer: Simple Link */}
+          <div className="flex justify-between items-center pt-3 border-t border-gray-50">
+            <span className="text-[10px] font-black text-blue-600 uppercase">View Details</span>
+            <ArrowRight className="h-4 w-4 text-gray-300 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-slate-500">
-          <Package className="h-3.5 w-3.5 opacity-70" />
-          <Badge className={cn("text-xs uppercase tracking-wide font-semibold", getStatusColor(invoice.status))}>
-            {invoice.status}
-          </Badge>
-        </div>
-      </div>
-    </div>
-    </Link>
+      </Link>
+    </motion.div>
   );
 }

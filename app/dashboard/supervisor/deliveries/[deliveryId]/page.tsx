@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import InvoiceCard from '@/components/supervisor/invoice-card';
 import Link from 'next/link';
-import { AlertCircle, ArrowLeft, CircleX, Info, Loader2, Package, Timer, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CircleX, Loader2, Package, Timer, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import DeliveryMap from '@/components/supervisor/delivery-map';
@@ -164,7 +164,7 @@ export default function ParticularDeliveryPage() {
                                                 </div>
 
                                                 <p className="text-sm text-slate-500 leading-relaxed">
-                                                    This run was finalized on <span className="font-semibold text-slate-700">{new Date(delivery.endedAt).toLocaleString('en-GB', {minute: '2-digit', hour: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric', hour12: true})}</span>.
+                                                    This run was finalized on <span className="font-semibold text-slate-700">{new Date(delivery.endedAt).toLocaleString('en-GB', { minute: '2-digit', hour: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric', hour12: true })}</span>.
                                                     All logs have been synced to the primary database.
                                                 </p>
                                             </div>
