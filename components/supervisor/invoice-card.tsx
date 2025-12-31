@@ -40,6 +40,7 @@ export default function InvoiceCard({
   };
 
   return (
+    <Link href={`/dashboard/supervisor/invoice/${invoice.invType}${invoice.invNo}`} className="block w-full">
     <div className={`bg-white border border-slate-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow ${invoice.status === 'DELIVERED' && !ended ? 'opacity-50' : 'opacity-100'}`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
@@ -62,16 +63,8 @@ export default function InvoiceCard({
             {invoice.status}
           </Badge>
         </div>
-          <Link href={`/dashboard/supervisor/invoice/${invoice.invType}${invoice.invNo}`} className="block w-full">
-            <Button
-              className="mt-2 h-12 w-full bg-green-50 text-green-600 hover:bg-green-600 hover:text-white border border-green-100 transition-all gap-2 font-semibold shadow-sm group"
-            >
-              <FileText className="w-4 h-4 transition-transform group-hover:scale-110" />
-              View Details
-              <ArrowRight className="w-4 h-4 ml-auto opacity-50 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </Link>
       </div>
     </div>
+    </Link>
   );
 }
