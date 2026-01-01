@@ -39,6 +39,10 @@ const InvoiceSearchContainer = () => {
         }
     };
 
+    const isValidSearchTerm = (term: string) => {
+        return term.match(/^([A-Z]{2})(\d+)$/)
+    }
+
     return (
         <div className="w-full space-y-4">
             {/* Toggle Buttons */}
@@ -100,6 +104,7 @@ const InvoiceSearchContainer = () => {
                             config[mode].border,
                             "hover:brightness-95 border"
                         )}
+                        disabled={!isValidSearchTerm(searchTerm)}
                     >
                         Search
                     </Button>
