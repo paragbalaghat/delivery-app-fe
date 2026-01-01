@@ -312,7 +312,7 @@ export default function ParticularDeliveryPage() {
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
-                                {invoices.map((inv) => (
+                                {invoices.slice().reverse().map((inv) => (
                                     <div key={`${inv.invType}-${inv.invNo}`} className="transition-transform active:scale-[0.98]">
                                         <InvoiceCard
                                             invoice={inv}
