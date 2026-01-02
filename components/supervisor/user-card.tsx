@@ -13,6 +13,7 @@ import {
 import { motion, Variants } from "framer-motion";
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import DeleteUserButton from "@/components/supervisor/delete-user";
 
 interface UserProfile {
   id: string;
@@ -155,10 +156,7 @@ export function UserInfoCard({ userId }: { userId: string }) {
 
         {/* Action Button - Green Theme */}
         <motion.div variants={itemVariants} className="mt-8">
-          <button onClick={handleDeleteUser} disabled={loading} className="w-full flex items-center justify-between px-5 py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-bold text-xs transition-all group shadow-lg shadow-red-100">
-            Delete User
-            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-          </button>
+          <DeleteUserButton userId={user.id} userName={user.name} />
         </motion.div>
       </div>
     </motion.div>
