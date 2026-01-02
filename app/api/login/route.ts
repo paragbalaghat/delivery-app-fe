@@ -33,6 +33,14 @@ export async function POST(request: NextRequest) {
             maxAge: 60 * 60 * 12, // 12 hours
         });
 
+        cookieStore.set("refreshToken", data.data.refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            path: '/',
+            maxAge: 60 * 60 * 24 * 7, // 7 days
+        });
+
         return NextResponse.json({ message: "Login successful" }, { status: 200 });
 
     } catch (error) {
